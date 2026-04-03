@@ -1,12 +1,16 @@
 import streamlit as st
-import os
+import subprocess
+import sys
 
-# --- STREAMLIT CLOUD HACK ---
-# ultralytics sneaks in the GUI version of OpenCV. 
-# This uninstalls it on boot so Python is forced to use the headless version.
+# --- STREAMLIT CLOUD HACK v2 ---
+# Using sys.executable ensures we are modifying the exact virtual 
+# environment that Streamlit is running in, not the global system.
 @st.cache_resource
 def force_opencv_headless():
-    os.system("pip uninstall -y opencv-python")
+    # 1. Force uninstall the broken GUI version
+    subprocess.call([sys.executable, "-m", "pip", "uninstall", "-y", "opencv-python"])
+    # 2. Force install the headless version just to be absolutely sure it's there
+    subprocess.call([sys.executable, "-m", "pip", "install", "opencv-python-headless"])
 
 force_opencv_headless()
 # ----------------------------
